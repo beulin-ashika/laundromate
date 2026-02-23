@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>laundromate — laundry access, for everyone.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:         #0d1412;
+  --white:       #f8faf7;
+  --green:       #1b4332;
+  --green-mid:   #2d6a4f;
+  --lime:        #b7e4c7;
+  --lime-bright: #d8f3dc;
+  --slate:       #52796f;
+  --muted:       #74a08a;
+  --border:      #d8e8df;
+  --red:         #c1121f;
+  --amber:       #e9c46a;
+  --surface:     #ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.serif{font-family:'Instrument Serif',serif;}
+.outfit{font-family:'Outfit',sans-serif;}
+
+.screen{display:none;}.screen.active{display:block;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(248,250,247,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;}
+.nav-inner{max-width:1120px;margin:0 auto;padding:0 28px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;cursor:pointer;border:none;background:none;}
+.logo-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:19px;color:var(--ink);letter-spacing:-.01em;}
+.nav-links{display:flex;align-items:center;gap:10px;}
+.btn-nav-ghost{padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;background:transparent;color:var(--slate);border:1.5px solid var(--border);transition:all .18s;}
+.btn-nav-ghost:hover{color:var(--ink);border-color:var(--ink);}
+.btn-nav-dark{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;background:var(--ink);color:white;border:none;transition:all .18s;}
+.btn-nav-dark:hover{background:#1e2e2a;}
+
+/* DEMO BAR */
+.demo-bar{background:var(--ink);color:white;padding:10px 20px;text-align:center;font-size:13px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.demo-tag{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.demo-tag:hover{background:rgba(255,255,255,.2);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:'DM Sans',sans-serif;}
+.btn-dark{background:var(--ink);color:white;}.btn-dark:hover{background:#1e2e2a;transform:translateY(-1px);box-shadow:0 6px 20px rgba(13,20,18,.18);}
+.btn-green{background:var(--green);color:white;}.btn-green:hover{background:var(--green-mid);transform:translateY(-1px);box-shadow:0 6px 20px rgba(27,67,50,.22);}
+.btn-lime{background:var(--lime-bright);color:var(--green);}.btn-lime:hover{background:var(--lime);transform:translateY(-1px);}
+.btn-white{background:white;color:var(--green);}.btn-white:hover{background:var(--lime-bright);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--border)!important;}.btn-ghost:hover{border-color:var(--ink)!important;}
+.btn-ghost-g{background:transparent;color:var(--green);border:2px solid var(--green)!important;}.btn-ghost-g:hover{background:var(--lime-bright);}
+.btn-red{background:#fee2e2;color:var(--red);border:none;}.btn-red:hover{background:#fecaca;}
+.btn-sm{padding:9px 18px;font-size:13px;border-radius:10px;}
+.btn-full{width:100%;}
+
+/* FIELD */
+.field{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:12px 15px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;background:white;color:var(--ink);}
+.field:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,67,50,.07);}
+select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2352796f' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.field-label{font-size:11px;font-weight:700;color:var(--slate);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;}
+textarea.field{resize:vertical;}
+
+/* CARD */
+.card{background:white;border:1.5px solid var(--border);border-radius:20px;overflow:hidden;}
+.card-hover{transition:all .2s;cursor:pointer;}
+.card-hover:hover{border-color:var(--green);box-shadow:0 8px 32px rgba(27,67,50,.1);transform:translateY(-2px);}
+
+/* ONBOARD */
+.onboard-wrap{min-height:calc(100vh - 104px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.onboard-box{width:100%;max-width:520px;background:white;border:1.5px solid var(--border);border-radius:28px;padding:44px;box-shadow:0 4px 48px rgba(13,20,18,.07);}
+@media(max-width:560px){.onboard-box{padding:28px 20px;}}
+
+/* PROGRESS */
+.prog-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:32px;}
+.prog-fill{height:100%;background:var(--green);border-radius:3px;transition:width .35s ease;}
+
+/* SLOTS */
+.slot{border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:600;text-align:center;background:white;}
+.slot:hover{border-color:var(--green);background:var(--lime-bright);}
+.slot.picked{background:var(--green);color:white;border-color:var(--green);}
+.slot.taken{background:#f3f3f3;color:#bbb;cursor:not-allowed;border-color:#eee;font-weight:400;}
+
+/* DAY BTN */
+.day-btn{padding:10px 12px;border-radius:10px;cursor:pointer;font-size:11px;font-weight:700;text-align:center;transition:all .15s;min-width:50px;border:1.5px solid var(--border);background:white;font-family:'DM Sans',sans-serif;}
+.day-btn:hover{border-color:var(--green);}
+.day-btn.on{background:var(--ink);color:white;border-color:var(--ink);}
+
+/* AVAIL */
+.avail{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:100px;}
+.avail-high{background:#d8f3dc;color:#1b4332;}
+.avail-mid{background:#fff3cd;color:#7d5a00;}
+.avail-low{background:#fde8e8;color:#8b1a1a;}
+.avail-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-high{background:#2d6a4f;}.dot-mid{background:#d4a017;}.dot-low{background:#c1121f;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.02em;}
+.badge-green{background:var(--lime-bright);color:var(--green);}
+.badge-ink{background:var(--ink);color:white;}
+.badge-amber{background:#fef3c7;color:#92400e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-white{background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.2);}
+
+/* CHECK ROW */
+.check-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid var(--border);border-radius:11px;transition:all .15s;user-select:none;}
+.check-row.on{border-color:var(--green);background:var(--lime-bright);}
+.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;cursor:pointer;}
+.check-row.on .check-box{background:var(--green);border-color:var(--green);color:white;}
+
+/* STARS */
+.stars{color:#c89b1a;}
+
+/* EARN CARD */
+.earn-card{background:var(--green);color:white;border-radius:24px;padding:32px;}
+
+/* REVIEW */
+.review{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:18px;}
+
+/* STRIKE PIP */
+.strike-pip{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:#ccc;}
+.strike-pip.hit{border-color:var(--red);color:var(--red);background:#fee2e2;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .3s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* MESSAGING */
+.msg-bubble-out{background:var(--green);color:white;border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:14px;max-width:80%;align-self:flex-end;}
+.msg-bubble-in{background:white;border:1.5px solid var(--border);color:var(--ink);border-radius:18px 18px 18px 4px;padding:10px 14px;font-size:14px;max-width:80%;align-self:flex-start;}
+.msg-time{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* PLAN TOGGLE */
+.plan-toggle{display:flex;background:var(--white);border:1.5px solid var(--border);border-radius:100px;padding:4px;gap:4px;}
+.plan-btn{padding:8px 20px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;border:none;background:transparent;color:var(--slate);font-family:'DM Sans',sans-serif;}
+.plan-btn.on{background:var(--green);color:white;}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:26px;text-align:center;cursor:pointer;transition:all .15s;background:var(--white);}
+.upload-zone:hover{border-color:var(--green);background:var(--lime-bright);}
+
+/* CHECKIN PHOTO */
+.photo-box{border:2px dashed var(--border);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;background:#f8f8f8;}
+.photo-box:hover{border-color:var(--green);background:var(--lime-bright);}
+.photo-box.done{border-color:var(--green);background:var(--lime-bright);border-style:solid;}
+
+/* LAYOUT */
+.container{max-width:1100px;margin:0 auto;}
+.container-sm{max-width:680px;margin:0 auto;}
+hr.rule{border:none;border-top:1px solid var(--border);}
+
+/* ANIM */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .42s ease both;}
+.d1{animation-delay:.07s}.d2{animation-delay:.14s}.d3{animation-delay:.21s}.d4{animation-delay:.28s}
+
+/* RESPONSIVE */
+@media(max-width:768px){.r-col{grid-template-columns:1fr!important;}.hide-sm{display:none!important;}}
+@media(max-width:480px){.r-col-2{grid-template-columns:1fr!important;}}
+</style>
+</head>
+<body>
+
+<!-- DEMO BAR -->
+<div class="demo-bar" id="demoBanner">
+  <span style="opacity:.4;font-size:11px;font-weight:700;letter-spacing:.08em;">DEMO</span>
+  <button class="demo-tag" onclick="demoGuest()">🫧 Laundromate view</button>
+  <button class="demo-tag" onclick="demoHost()">🏠 Host dashboard</button>
+  <button onclick="hideBanner()" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;line-height:1;margin-left:4px;">×</button>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav" style="top:40px;">
+  <div class="nav-inner">
+    <button class="logo" onclick="go('guest-landing')">
+      <span class="logo-text">laundromate</span>
+    </button>
+    <div class="nav-links">
+      <button class="btn-nav-ghost" onclick="go('host-landing')">For hosts</button>
+      <button class="btn-nav-dark" id="navCta" onclick="handleNavCta()">Find a machine</button>
+    </div>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<main id="main" style="padding-top:104px;">
+
+<!-- ══════════════════════════════
+     GUEST LANDING
+══════════════════════════════ -->
+<div class="screen active" id="screen-guest-landing">
+  <section style="padding:84px 28px 96px;position:relative;overflow:hidden;">
+    <div style="position:absolute;width:520px;height:520px;top:-140px;right:-100px;background:var(--lime);border-radius:50%;opacity:.25;filter:blur(72px);pointer-events:none;"></div>
+    <div style="position:absolute;width:300px;height:300px;bottom:-80px;left:-60px;background:var(--lime);border-radius:50%;opacity:.14;filter:blur(56px);pointer-events:none;"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div style="max-width:680px;">
+        <h1 class="serif fade-up" style="font-size:clamp(50px,8vw,88px);line-height:1.03;letter-spacing:-2px;margin-bottom:22px;">
+          There's a washer<br>right next door.<br><em style="color:var(--green);">Book it now.</em>
+        </h1>
+        <p class="fade-up d1" style="font-size:18px;color:var(--slate);max-width:520px;line-height:1.8;margin-bottom:36px;">
+          Why commute to a laundromat and wait when there's likely a machine on your street — or the building next door? No lines, no lugging bags across town. Just walk over and wash.
+        </p>
+        <div class="fade-up d2" style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-dark" style="font-size:16px;padding:17px 34px;" onclick="go('guest-onboard')">Find a machine now →</button>
+        </div>
+        <p class="fade-up d3" style="font-size:13px;color:var(--muted);margin-top:18px;">Hundreds of verified hosts. 5 cities and growing.</p>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:36px 28px;background:var(--ink);">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:20px;text-align:center;">
+        <div><div class="serif" style="font-size:36px;color:white;">1,200+</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Verified hosts</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">8,400+</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Bookings completed</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">4.9★</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Avg host rating</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">5 cities</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">And growing</div></div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:80px 28px;">
+    <div class="container">
+      <div style="margin-bottom:52px;">
+        <div class="badge badge-green" style="margin-bottom:14px;">How it works</div>
+        <h2 class="serif" style="font-size:clamp(32px,4vw,52px);line-height:1.08;">Three steps. That's it.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;" class="r-col">
+        <div style="padding:32px;background:var(--lime-bright);border-radius:24px;">
+          <div style="font-size:38px;margin-bottom:18px;">📍</div>
+          <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:10px;">STEP 01</div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">Find a machine</h3>
+          <p style="font-size:14px;color:var(--slate);line-height:1.8;">Search by your street address or share your location. See verified laundry rooms nearby — machine specs, pricing, and open slots.</p>
+        </div>
+        <div style="padding:32px;background:white;border:1.5px solid var(--border);border-radius:24px;">
+          <div style="font-size:38px;margin-bottom:18px;">📅</div>
+          <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:10px;">STEP 02</div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">Confirm your slot</h3>
+          <p style="font-size:14px;color:var(--slate);line-height:1.8;">Pick a slot and lock it in. You'll get the address, access code, and a reminder text 30 minutes before.</p>
+        </div>
+        <div style="padding:32px;background:var(--ink);color:white;border-radius:24px;">
+          <div style="font-size:38px;margin-bottom:18px;">🫧</div>
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;margin-bottom:10px;">STEP 03</div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">Wash</h3>
+          <p style="font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;">Walk over, check in on the app, use the machine. The listing tells you exactly how payment works before you go.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:80px 28px;">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;" class="r-col">
+        <div>
+          <div class="badge badge-ink" style="margin-bottom:16px;">Your safety. Our job.</div>
+          <h2 class="serif" style="font-size:clamp(28px,3.5vw,46px);line-height:1.15;margin-bottom:20px;">We vet every host so you don't have to think twice.</h2>
+          <p style="font-size:15px;color:var(--slate);line-height:1.85;margin-bottom:32px;">Every laundry room on laundromate is in a verified common area — never in anyone's private home. You know exactly what you're walking into before you leave.</p>
+          <button class="btn btn-dark btn-sm" onclick="go('guest-onboard')">Find a machine near me →</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:16px;padding:22px;background:var(--lime-bright);border-radius:16px;align-items:flex-start;">
+            <div style="font-size:26px;flex-shrink:0;">✅</div>
+            <div><div style="font-weight:700;margin-bottom:5px;">All hosts are verified for your safety</div><div style="font-size:14px;color:var(--slate);line-height:1.65;">Every host submits proof of property authority. Only common-area machines — never private residences.</div></div>
+          </div>
+          <div style="display:flex;gap:16px;padding:22px;background:white;border:1.5px solid var(--border);border-radius:16px;align-items:flex-start;">
+            <div style="font-size:26px;flex-shrink:0;">📱</div>
+            <div><div style="font-weight:700;margin-bottom:5px;">You'll get a reminder so you never miss your slot</div><div style="font-size:14px;color:var(--slate);line-height:1.65;">A text 30 minutes before, every time. No calendar juggling required.</div></div>
+          </div>
+          <div style="display:flex;gap:16px;padding:22px;background:white;border:1.5px solid var(--border);border-radius:16px;align-items:flex-start;">
+            <div style="font-size:26px;flex-shrink:0;">⭐</div>
+            <div><div style="font-weight:700;margin-bottom:5px;">Real reviews from real Laundromates</div><div style="font-size:14px;color:var(--slate);line-height:1.65;">Every review is tied to a completed, verified booking. Hosts consistently below 1.8 stars are removed from the platform.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:96px 28px;background:var(--ink);text-align:center;">
+    <div class="container-sm">
+      <h2 class="serif" style="font-size:clamp(36px,6vw,68px);color:white;line-height:1.06;margin-bottom:18px;">Done with laundry<br>anxiety for good?</h2>
+      <p style="font-size:18px;color:rgba(255,255,255,.5);margin-bottom:38px;line-height:1.7;">There's a machine near you right now. Stop putting it off.</p>
+      <button class="btn btn-lime" style="font-size:17px;padding:18px 42px;border-radius:14px;" onclick="go('guest-onboard')">Find my nearest machine →</button>
+    </div>
+  </section>
+  <footer style="background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:36px 28px;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <span class="logo-text" style="color:white;">laundromate</span>
+      <div style="font-size:13px;color:rgba(255,255,255,.25);">© 2025 laundromate · <a href="#" style="color:rgba(255,255,255,.25);text-decoration:none;">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.25);text-decoration:none;">Terms</a></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════
+     HOST LANDING
+══════════════════════════════ -->
+<div class="screen" id="screen-host-landing">
+  <section style="padding:88px 28px 96px;background:var(--green);color:white;position:relative;overflow:hidden;">
+    <div style="position:absolute;width:500px;height:500px;top:-120px;right:-100px;background:rgba(255,255,255,.04);border-radius:50%;pointer-events:none;"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div style="max-width:660px;">
+        <div class="badge badge-white" style="margin-bottom:22px;">💡 You could be making money right now</div>
+        <h1 class="serif" style="font-size:clamp(44px,7vw,78px);line-height:1.04;letter-spacing:-1.5px;margin-bottom:24px;">Your machines<br>sit empty.</h1>
+        <p style="font-size:18px;color:rgba(255,255,255,.65);max-width:500px;line-height:1.8;margin-bottom:14px;">Every idle hour is an hour you could be earning from. Your neighbors are already searching for machines — list yours and let them book the open slots.</p>
+        <p style="font-size:17px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:38px;">Hosts average $300–$500/month.</p>
+        <button class="btn btn-white" style="font-size:16px;padding:17px 34px;" onclick="go('host-onboard')">List my machines →</button>
+        <p style="font-size:13px;color:rgba(255,255,255,.35);margin-top:16px;">30-day free trial. No card needed.</p>
+      </div>
+    </div>
+  </section>
+  <section style="padding:36px 28px;background:var(--ink);">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:20px;text-align:center;">
+        <div><div class="serif" style="font-size:36px;color:white;">$340</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Avg monthly earnings</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">1,200+</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Listed properties</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">4.9★</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Avg host rating</div></div>
+        <div><div class="serif" style="font-size:36px;color:white;">96%</div><div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">Guest show-up rate</div></div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:80px 28px;">
+    <div class="container">
+      <div style="margin-bottom:52px;">
+        <div class="badge badge-green" style="margin-bottom:14px;">How hosting works</div>
+        <h2 class="serif" style="font-size:clamp(32px,4vw,52px);line-height:1.08;">List once. Fill idle slots. Earn.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;" class="r-col">
+        <div style="padding:32px;background:var(--lime-bright);border-radius:24px;"><div style="font-size:38px;margin-bottom:18px;">🏢</div><div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:10px;">STEP 01</div><h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">List your laundry room</h3><p style="font-size:14px;color:var(--slate);line-height:1.8;">Add your machines, verify your authority over the space, upload a photo, and set the hours you want open to guests.</p></div>
+        <div style="padding:32px;background:white;border:1.5px solid var(--border);border-radius:24px;"><div style="font-size:38px;margin-bottom:18px;">📬</div><div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:10px;">STEP 02</div><h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">Laundromates book</h3><p style="font-size:14px;color:var(--slate);line-height:1.8;">Neighbors find your open slots and book through the app. You get notified when a booking is made and when a guest checks in.</p></div>
+        <div style="padding:32px;background:var(--ink);color:white;border-radius:24px;"><div style="font-size:38px;margin-bottom:18px;">💰</div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.08em;margin-bottom:10px;">STEP 03</div><h3 style="font-size:20px;font-weight:700;margin-bottom:10px;">The machine does the rest</h3><p style="font-size:14px;color:rgba(255,255,255,.6);line-height:1.8;">Guests pay your machine directly — coin, card, or built-in app. The earnings go straight to you.</p></div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:80px 28px;">
+    <div class="container-sm">
+      <div style="text-align:center;margin-bottom:48px;">
+        <div class="badge badge-green" style="margin-bottom:14px;">Pricing</div>
+        <h2 class="serif" style="font-size:clamp(30px,4vw,50px);line-height:1.08;margin-bottom:16px;">One flat fee. Nothing else.</h2>
+        <p style="font-size:16px;color:var(--slate);line-height:1.7;max-width:480px;margin:0 auto;">A small subscription keeps the platform running and ad-free. Every dollar your machines earn goes directly to you — we don't take a cut.</p>
+      </div>
+      <div style="display:flex;justify-content:center;margin-bottom:32px;">
+        <div class="plan-toggle">
+          <button class="plan-btn on" id="planMonthly" onclick="showPlan('monthly')">Monthly</button>
+          <button class="plan-btn" id="planYearly" onclick="showPlan('yearly')">Yearly <span style="background:var(--lime-bright);color:var(--green);padding:2px 8px;border-radius:100px;font-size:11px;margin-left:4px;">Save 30%</span></button>
+        </div>
+      </div>
+      <div style="background:var(--green);border-radius:28px;padding:44px;color:white;text-align:center;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%;pointer-events:none;"></div>
+        <div class="badge badge-white" style="margin-bottom:20px;">🎁 Introductory pricing — limited time</div>
+        <div id="priceMonthly">
+          <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:6px;"><span class="serif" style="font-size:80px;line-height:1;">$3</span><span style="font-size:22px;color:rgba(255,255,255,.55);">/month</span></div>
+          <div style="font-size:14px;color:rgba(255,255,255,.45);margin-bottom:6px;">Increases to $5/month after launch</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:28px;">30-day free trial · no card required</div>
+        </div>
+        <div id="priceYearly" style="display:none;">
+          <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:6px;"><span class="serif" style="font-size:80px;line-height:1;">$25</span><span style="font-size:22px;color:rgba(255,255,255,.55);">/year</span></div>
+          <div style="font-size:14px;color:var(--lime);font-weight:700;margin-bottom:6px;">Just $2.08/month — save $11 vs monthly</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:28px;">30-day free trial · no card required</div>
+        </div>
+        <div style="background:rgba(255,255,255,.08);border-radius:16px;padding:22px;text-align:left;margin-bottom:32px;">
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.07em;margin-bottom:14px;">WHAT'S INCLUDED</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" class="r-col-2">
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Full listing visibility</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Unlimited bookings</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Guest SMS reminders</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Verified guest profiles</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Booking dashboard</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> 0% commission, always</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> No ads, ever</div>
+            <div style="display:flex;gap:8px;font-size:14px;color:rgba(255,255,255,.8);"><span style="color:var(--lime);">✓</span> Cancel any time</div>
+          </div>
+        </div>
+        <button class="btn btn-white" style="font-size:16px;padding:16px 36px;" onclick="go('host-onboard')">Start free trial →</button>
+      </div>
+      <div style="margin-top:20px;background:var(--lime-bright);border-radius:16px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start;">
+        <span style="font-size:20px;flex-shrink:0;">💡</span>
+        <div style="font-size:14px;color:var(--green);line-height:1.7;">We charge a flat fee — not a commission — so you're never penalised for being busy. The subscription covers platform maintenance and keeps the experience ad-free for everyone.</div>
+      </div>
+    </div>
+  </section>
+  <hr class="rule">
+  <section style="padding:96px 28px;background:var(--ink);text-align:center;">
+    <div class="container-sm">
+      <h2 class="serif" style="font-size:clamp(34px,5.5vw,64px);color:white;line-height:1.06;margin-bottom:18px;">Right now, someone<br>on your street is<br><em style="color:var(--lime);">looking for a machine.</em></h2>
+      <p style="font-size:17px;color:rgba(255,255,255,.45);margin-bottom:40px;line-height:1.7;">Your laundry room is already there. Let's put it to work.</p>
+      <button class="btn btn-lime" style="font-size:17px;padding:18px 42px;border-radius:14px;" onclick="go('host-onboard')">List my machines →</button>
+    </div>
+  </section>
+  <footer style="background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:36px 28px;">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <span class="logo-text" style="color:white;">laundromate</span>
+      <div style="font-size:13px;color:rgba(255,255,255,.25);">© 2025 laundromate · <a href="#" style="color:rgba(255,255,255,.25);text-decoration:none;">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.25);text-decoration:none;">Terms</a></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════
+     GUEST ONBOARDING
+══════════════════════════════ -->
+<div class="screen" id="screen-guest-onboard">
+  <div class="onboard-wrap">
+    <div class="onboard-box fade-up">
+      <div class="prog-track"><div class="prog-fill" id="gProg" style="width:33%"></div></div>
+      <div id="gs1">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 1 OF 3</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Where are you?</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:28px;">We'll find what's available on your street right now.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label class="field-label">Street address</label>
+            <input class="field" id="gStreet" placeholder="e.g. 14 Elm Street, Boston">
+          </div>
+          <div style="text-align:center;position:relative;">
+            <hr class="rule" style="margin:8px 0;">
+            <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:0 12px;font-size:12px;color:var(--muted);">or</span>
+          </div>
+          <button class="btn btn-ghost btn-full" onclick="useLocation()">📍 Use my current location</button>
+        </div>
+        <button class="btn btn-dark btn-full" style="margin-top:22px;" onclick="gNext(1)">Show me machines →</button>
+        <p style="text-align:center;font-size:13px;color:var(--slate);margin-top:16px;">Already have an account? <a href="#" onclick="demoGuest()" style="color:var(--green);font-weight:700;text-decoration:none;">Sign in</a></p>
+      </div>
+      <div id="gs2" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 2 OF 3</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Create your account</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:28px;">Takes less than a minute.</p>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label class="field-label">First name</label><input class="field" id="gFirst" placeholder="Alex"></div>
+            <div><label class="field-label">Last name</label><input class="field" placeholder="Rivera"></div>
+          </div>
+          <div><label class="field-label">Email</label><input class="field" id="gEmail" type="email" placeholder="you@email.com"></div>
+          <div><label class="field-label">Phone (for your slot reminder)</label><input class="field" placeholder="+1 (617) 555-0100"></div>
+          <div><label class="field-label">Password</label><input class="field" type="password" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-dark btn-full" style="margin-top:22px;" onclick="gNext(2)">Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="gBack(2)">← Back</button>
+      </div>
+      <div id="gs3" style="display:none;text-align:center;">
+        <div style="font-size:64px;margin-bottom:16px;">🫧</div>
+        <h2 class="serif" style="font-size:34px;margin-bottom:10px;">You're a Laundromate!</h2>
+        <p style="color:var(--slate);font-size:15px;line-height:1.75;margin-bottom:26px;">Find a laundry room near you, lock in your slot, and walk over.</p>
+        <div style="background:var(--lime-bright);border-radius:16px;padding:18px;text-align:left;margin-bottom:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:10px;">What happens next:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--slate);">
+            <div>📍 Browse verified laundry rooms near you</div>
+            <div>📅 Pick a slot and confirm</div>
+            <div>📱 Text reminder 30 min before your slot</div>
+            <div>📸 Check in on arrival with a photo of the machine</div>
+            <div>🫧 Wash, then rate your host</div>
+          </div>
+        </div>
+        <div style="background:#f8f8f8;border-radius:12px;padding:14px 16px;text-align:left;margin-bottom:22px;font-size:13px;color:var(--slate);">
+          💳 <strong>First booking?</strong> We hold a $5 refundable deposit — returned automatically after your check-in is confirmed.
+        </div>
+        <button class="btn btn-dark btn-full" onclick="finishGuestOnboard()">Find machines near me →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     GUEST DISCOVERY (not signed in)
+══════════════════════════════ -->
+<div class="screen" id="screen-guest-discover-teaser">
+  <div style="background:white;border-bottom:1.5px solid var(--border);padding:14px 28px;position:sticky;top:64px;z-index:50;">
+    <div class="container">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;position:relative;">
+          <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;">📍</span>
+          <input class="field" style="padding-left:38px;" id="teaserSearch" placeholder="Your street address" value="14 Elm Street, Boston">
+        </div>
+        <button class="btn btn-dark btn-sm" onclick="toast('Searching nearby…')">Search</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:28px;">
+    <div class="container">
+      <div style="margin-bottom:28px;">
+        <h2 style="font-size:20px;font-weight:800;">Laundry rooms near you</h2>
+        <p style="font-size:14px;color:var(--slate);margin-top:2px;">Showing results within 0.5 miles</p>
+      </div>
+      <!-- Teaser cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:32px;" id="teaserGrid"></div>
+      <!-- Sign up wall -->
+      <div style="background:var(--ink);border-radius:24px;padding:40px;text-align:center;color:white;">
+        <div style="font-size:36px;margin-bottom:16px;">🔒</div>
+        <h3 class="serif" style="font-size:28px;margin-bottom:12px;">Sign up to see details</h3>
+        <p style="color:rgba(255,255,255,.55);font-size:15px;margin-bottom:28px;line-height:1.7;">Create a free account to see exact addresses, machine specs, pricing, and available slots.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn btn-lime" onclick="go('guest-onboard')">Create free account →</button>
+          <button class="btn btn-ghost-white" onclick="demoGuest()" style="border-color:rgba(255,255,255,.3)!important;color:white;">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     GUEST DISCOVERY (signed in)
+══════════════════════════════ -->
+<div class="screen" id="screen-guest-discover">
+  <div style="background:white;border-bottom:1.5px solid var(--border);padding:14px 28px;position:sticky;top:64px;z-index:50;">
+    <div class="container">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;position:relative;">
+          <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;">📍</span>
+          <input class="field" style="padding-left:38px;" placeholder="Your street address" value="14 Elm Street, Boston MA">
+        </div>
+        <select class="field" style="max-width:160px;"><option>Any payment</option><option>Coin-operated</option><option>Card reader</option><option>App-based</option></select>
+        <select class="field" style="max-width:140px;"><option>Any capacity</option><option>Standard</option><option>Large</option><option>Extra-large</option></select>
+        <button class="btn btn-dark btn-sm" onclick="toast('Listings refreshed!')">Search</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:28px;">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;flex-wrap:wrap;gap:10px;">
+        <div><h2 style="font-size:20px;font-weight:800;">Laundry rooms near you</h2><p style="font-size:14px;color:var(--slate);margin-top:2px;">5 listings · sorted by distance</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;" id="listingsGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     LISTING DETAIL
+══════════════════════════════ -->
+<div class="screen" id="screen-listing-detail">
+  <div style="max-width:980px;margin:0 auto;padding:28px;" id="detailWrap"></div>
+</div>
+
+<!-- ══════════════════════════════
+     BOOKING CONFIRM
+══════════════════════════════ -->
+<div class="screen" id="screen-booking-confirm">
+  <div class="onboard-wrap"><div class="onboard-box fade-up" id="bookingConfirmBox"></div></div>
+</div>
+
+<!-- ══════════════════════════════
+     POST BOOKING
+══════════════════════════════ -->
+<div class="screen" id="screen-post-booking">
+  <div class="onboard-wrap">
+    <div class="onboard-box fade-up" style="text-align:center;">
+      <div style="font-size:68px;margin-bottom:16px;">✅</div>
+      <h2 class="serif" style="font-size:34px;margin-bottom:10px;">You're booked!</h2>
+      <p style="color:var(--slate);font-size:15px;margin-bottom:26px;">Just walk over. Everything you need is below.</p>
+      <div class="card" style="padding:22px;text-align:left;margin-bottom:16px;" id="postDetails"></div>
+      <div style="display:flex;gap:14px;padding:18px;background:var(--lime-bright);border-radius:14px;text-align:left;margin-bottom:14px;align-items:flex-start;">
+        <div style="font-size:24px;flex-shrink:0;">📱</div>
+        <div><div style="font-weight:700;font-size:14px;">Reminder on its way</div><div style="font-size:13px;color:var(--slate);margin-top:3px;">You'll get a text 30 minutes before your slot.</div></div>
+      </div>
+      <div style="display:flex;gap:14px;padding:18px;background:#f8f8f8;border-radius:14px;text-align:left;margin-bottom:22px;align-items:flex-start;">
+        <div style="font-size:24px;flex-shrink:0;">📸</div>
+        <div><div style="font-weight:700;font-size:14px;">Check in when you arrive</div><div style="font-size:13px;color:var(--slate);margin-top:3px;">Open the app and take a photo of the machine when you get there. You have 15 minutes from your slot start time.</div></div>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-dark btn-full" onclick="go('guest-dashboard')">View my bookings</button>
+        <button class="btn btn-ghost-g btn-full" onclick="go('guest-checkin')">Check in now →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CHECK IN FLOW
+══════════════════════════════ -->
+<div class="screen" id="screen-guest-checkin">
+  <div class="onboard-wrap">
+    <div class="onboard-box fade-up">
+      <div id="checkin-step1">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--lime-bright);border-radius:50%;font-size:28px;margin-bottom:14px;">📸</div>
+          <h2 class="serif" style="font-size:28px;margin-bottom:8px;">Check in</h2>
+          <p style="color:var(--slate);font-size:14px;line-height:1.7;">Take a photo of the machine to confirm you've arrived. The display should be visible — running or ready.</p>
+        </div>
+        <div style="background:#fff3cd;border-radius:12px;padding:13px 15px;font-size:13px;color:#7d5a00;margin-bottom:22px;display:flex;gap:8px;align-items:flex-start;">
+          <span>⏱️</span><span>You have <strong id="checkinTimer">14:32</strong> remaining from your slot start time.</span>
+        </div>
+        <div class="photo-box" id="photoBox1" onclick="simulatePhoto('photoBox1','checkin-step2')">
+          <div style="font-size:40px;margin-bottom:10px;">📷</div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px;">Tap to take photo</div>
+          <div style="font-size:13px;color:var(--slate);">Machine display must be visible</div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:14px;">Photo is timestamped and geotagged. Used only to verify your visit.</p>
+      </div>
+      <div id="checkin-step2" style="display:none;text-align:center;">
+        <div style="font-size:64px;margin-bottom:16px;">✅</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:10px;">You're checked in!</h2>
+        <p style="color:var(--slate);font-size:15px;line-height:1.75;margin-bottom:24px;">Your slot is confirmed. Your $5 deposit will be released automatically at the end of your slot.</p>
+        <div style="background:var(--lime-bright);border-radius:14px;padding:18px;text-align:left;margin-bottom:22px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--green);">Your slot</div>
+          <div style="font-size:14px;color:var(--slate);display:flex;flex-direction:column;gap:6px;">
+            <div>📍 Cambridge Arms — 247 Concord Ave</div>
+            <div>⏰ 10:00 AM – 12:00 PM (ends in <strong>1h 48m</strong>)</div>
+            <div>💳 $5 deposit releasing at slot end</div>
+          </div>
+        </div>
+        <button class="btn btn-dark btn-full" onclick="go('guest-dashboard')">Go to my bookings →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MESSAGING
+══════════════════════════════ -->
+<div class="screen" id="screen-messaging">
+  <div style="max-width:680px;margin:0 auto;padding:28px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <button onclick="go('guest-dashboard')" style="background:none;border:none;cursor:pointer;color:var(--green);font-weight:700;font-size:14px;padding:0;">←</button>
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--lime-bright);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+      <div>
+        <div style="font-weight:700;">Margaret Chen</div>
+        <div style="font-size:12px;color:var(--slate);">Cambridge Arms · Sat Feb 22, 10:00–12:00 PM</div>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:20px;display:flex;flex-direction:column;gap:14px;min-height:360px;max-height:480px;overflow-y:auto;" id="msgThread">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;">
+          <div class="msg-bubble-in">Hi! Just confirming your booking for Saturday. The basement entrance is on the left side of the building — the door code is 4829#. Let me know if you have any questions!</div>
+          <div class="msg-time">Margaret · Thu 9:14 AM</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="msg-bubble-out">Perfect, thank you! Quick question — is there a folding table in there?</div>
+          <div class="msg-time">You · Thu 9:22 AM</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;">
+          <div class="msg-bubble-in">Yes, there's a folding table and a drying rack too. See you Saturday!</div>
+          <div class="msg-time">Margaret · Thu 9:31 AM</div>
+        </div>
+      </div>
+      <div style="padding:16px;border-top:1.5px solid var(--border);display:flex;gap:10px;">
+        <input class="field" id="msgInput" placeholder="Type a message…" style="flex:1;" onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="btn btn-dark btn-sm" onclick="sendMsg()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     GUEST DASHBOARD
+══════════════════════════════ -->
+<div class="screen" id="screen-guest-dashboard">
+  <div style="min-height:calc(100vh - 64px);padding:32px 28px;">
+    <div style="max-width:720px;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:12px;">
+        <div><h1 class="serif" style="font-size:34px;">Hey, Alex 👋</h1><p style="color:var(--slate);font-size:14px;margin-top:3px;">alex.rivera@email.com</p></div>
+        <button class="btn btn-dark btn-sm" onclick="go('guest-discover')">+ Book a machine</button>
+      </div>
+      <!-- Strikes -->
+      <div class="card" style="padding:24px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <div><div style="font-weight:700;font-size:16px;margin-bottom:4px;">Your reliability record</div><div style="font-size:13px;color:var(--slate);">3 no-shows = temporary suspension. Hosts see your record before confirming.</div></div>
+          <span class="badge badge-green">✓ All clear</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div class="strike-pip">✕</div><div class="strike-pip">✕</div><div class="strike-pip">✕</div>
+          <div style="font-size:13px;color:var(--slate);margin-left:6px;">0 of 3 strikes</div>
+        </div>
+      </div>
+      <!-- Upcoming -->
+      <div class="card" style="padding:24px;margin-bottom:16px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:18px;">Your next slot</h3>
+        <div style="border:1.5px solid var(--lime);border-radius:14px;padding:20px;background:var(--lime-bright);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:700;font-size:15px;">Cambridge Arms — Basement Laundry</div>
+              <div style="color:var(--slate);font-size:13px;margin-top:2px;">247 Concord Ave, Cambridge · 0.4 mi</div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <span class="badge badge-ink">Sat Feb 22</span>
+                <span class="badge badge-ink">10:00 AM – 12:00 PM</span>
+                <span class="badge badge-green">Confirmed</span>
+              </div>
+              <div style="margin-top:12px;padding:10px 14px;background:white;border-radius:10px;font-size:13px;display:inline-flex;align-items:center;gap:8px;">🔑 Access code: <strong style="font-family:monospace;letter-spacing:.1em;">4829#</strong></div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:12px;color:var(--slate);">Machine pricing</div>
+              <div style="font-weight:800;font-size:16px;line-height:1.4;">Wash $4.00</div>
+              <div style="font-weight:800;font-size:16px;line-height:1.4;">Dry $2.00</div>
+              <div style="font-size:11px;color:var(--slate);margin-top:4px;">Coin-operated</div>
+            </div>
+          </div>
+          <div style="border-top:1px solid rgba(27,67,50,.12);margin-top:16px;padding-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-dark btn-sm" onclick="go('guest-checkin')">📸 Check in</button>
+            <button class="btn btn-ghost-g btn-sm" onclick="go('messaging')">💬 Message host</button>
+            <button class="btn btn-ghost-g btn-sm" onclick="toast('Directions opened in Maps')">📍 Directions</button>
+            <button class="btn btn-sm btn-red" onclick="cancelBooking()">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <!-- Past -->
+      <div class="card" style="padding:24px;margin-bottom:16px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:18px;">Past bookings</h3>
+        <div style="border:1.5px solid var(--border);border-radius:14px;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px;">✅</div>
+            <div>
+              <div style="font-weight:700;font-size:14px;">Allston Commons — Laundry Room B</div>
+              <div style="font-size:12px;color:var(--slate);">Feb 15 · 2:00–4:00 PM</div>
+              <div class="stars" style="font-size:13px;margin-top:4px;">★★★★★ <span style="color:var(--slate);font-size:12px;">You rated this</span></div>
+            </div>
+          </div>
+          <div style="text-align:right;"><div style="font-size:12px;color:var(--green);font-weight:700;">$5 deposit returned ✓</div></div>
+        </div>
+      </div>
+      <!-- Account -->
+      <div class="card" style="padding:24px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:18px;">Account</h3>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div><label class="field-label">Name</label><input class="field" value="Alex Rivera"></div>
+          <div><label class="field-label">Email</label><input class="field" value="alex.rivera@email.com"></div>
+          <div><label class="field-label">Phone</label><input class="field" value="+1 (617) 555-0142"></div>
+          <button class="btn btn-dark btn-sm" style="align-self:flex-start;" onclick="toast('Settings saved!')">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     HOST ONBOARDING
+══════════════════════════════ -->
+<div class="screen" id="screen-host-onboard">
+  <div class="onboard-wrap" style="background:var(--lime-bright);">
+    <div class="onboard-box fade-up">
+      <div class="prog-track"><div class="prog-fill" id="hProg" style="width:14%;background:var(--green)"></div></div>
+      <div id="hs1">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 1 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Where is your property?</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:28px;">We match your listing with Laundromates searching on your street.</p>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div><label class="field-label">Street address</label><input class="field" placeholder="123 Main St"></div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+            <div><label class="field-label">City</label><input class="field" placeholder="Boston"></div>
+            <div><label class="field-label">Zip</label><input class="field" placeholder="02115" maxlength="5"></div>
+          </div>
+          <div><label class="field-label">State</label><input class="field" placeholder="MA"></div>
+        </div>
+        <button class="btn btn-green btn-full" style="margin-top:22px;" onclick="hNext(1)">Continue →</button>
+      </div>
+      <div id="hs2" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 2 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Create your host account</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:28px;">Where we send booking notifications.</p>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label class="field-label">First name</label><input class="field" placeholder="Jordan"></div>
+            <div><label class="field-label">Last name</label><input class="field" placeholder="Torres"></div>
+          </div>
+          <div><label class="field-label">Email</label><input class="field" type="email" placeholder="you@email.com"></div>
+          <div><label class="field-label">Phone</label><input class="field" placeholder="+1 (617) 555-0100"></div>
+          <div><label class="field-label">Password</label><input class="field" type="password" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-green btn-full" style="margin-top:22px;" onclick="hNext(2)">Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="hBack(2)">← Back</button>
+      </div>
+      <div id="hs3" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 3 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Verify your authority</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:10px;">Only landlords and property managers with authority over the space can list on laundromate.</p>
+        <div style="background:#fff3cd;border-radius:12px;padding:13px 15px;font-size:13px;color:#7d5a00;margin-bottom:22px;display:flex;gap:8px;align-items:flex-start;">
+          <span>⚠️</span><span>Machines must be in a <strong>common area</strong> — a basement laundry room or dedicated laundry floor. Never in a private home or living space.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div><label class="field-label">Your role</label><select class="field"><option value="">Select…</option><option>Property owner / landlord</option><option>Property manager</option><option>Building superintendent (with owner authorization)</option></select></div>
+          <div><label class="field-label">Proof of authority</label><div class="upload-zone" onclick="toast('File picker opened (demo)')"><div style="font-size:28px;margin-bottom:8px;">📄</div><div style="font-weight:700;font-size:14px;margin-bottom:4px;">Click to upload</div><div style="font-size:13px;color:var(--slate);">Property deed, management contract, or authorization letter</div></div></div>
+          <div><label class="field-label">Photo of the laundry room</label><div class="upload-zone" onclick="toast('File picker opened (demo)')"><div style="font-size:28px;margin-bottom:8px;">📸</div><div style="font-weight:700;font-size:14px;margin-bottom:4px;">Click to upload</div><div style="font-size:13px;color:var(--slate);">Must show machines in a common area — not a private home</div></div></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:14px;background:white;border:1.5px solid var(--border);border-radius:11px;">
+            <input type="checkbox" id="authCheck" style="margin-top:2px;accent-color:var(--green);width:16px;height:16px;flex-shrink:0;cursor:pointer;">
+            <label for="authCheck" style="font-size:13px;color:var(--slate);line-height:1.6;cursor:pointer;">I confirm these machines are in a <strong>common area</strong> and I have full authority to grant access to this space.</label>
+          </div>
+        </div>
+        <button class="btn btn-green btn-full" style="margin-top:22px;" onclick="hNext(3)">Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="hBack(3)">← Back</button>
+      </div>
+      <div id="hs4" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 4 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Your machines</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:22px;">Laundromates want the details before they book.</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="border:1.5px solid var(--border);border-radius:14px;padding:20px;background:white;">
+            <div style="font-weight:700;font-size:15px;margin-bottom:14px;">🫧 Washers</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label class="field-label">Number</label><select class="field"><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>
+              <div><label class="field-label">Type</label><select class="field"><option>Top-load</option><option>Front-load</option><option>Mix of both</option></select></div>
+              <div><label class="field-label">Capacity</label><select class="field"><option>Standard (~3.5 cu ft)</option><option>Large (~4.5 cu ft)</option><option>Extra-large (~5.5 cu ft+)</option></select></div>
+              <div><label class="field-label">Cost per cycle</label><input class="field" placeholder="e.g. $4.00"></div>
+            </div>
+          </div>
+          <div style="border:1.5px solid var(--border);border-radius:14px;padding:20px;background:white;">
+            <div style="font-weight:700;font-size:15px;margin-bottom:14px;">♨️ Dryers</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label class="field-label">Number</label><select class="field"><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>
+              <div><label class="field-label">Type</label><select class="field"><option>Electric</option><option>Gas</option></select></div>
+              <div><label class="field-label">Capacity</label><select class="field"><option>Standard (~7 cu ft)</option><option>Large (~8.5 cu ft)</option><option>Extra-large (~9 cu ft+)</option></select></div>
+              <div><label class="field-label">Cost per cycle</label><input class="field" placeholder="e.g. $2.00"></div>
+            </div>
+          </div>
+          <div><label class="field-label">Payment method</label><select class="field"><option>Coin-operated only</option><option>Built-in card reader</option><option>App-based (e.g. ShinePay, Laundryview)</option><option>Coin + card reader</option></select></div>
+          <div><label class="field-label">Notes for Laundromates</label><textarea class="field" rows="3" placeholder="e.g. Basement entrance via side door. Detergent vending available. Cycles run approx. 35 min."></textarea></div>
+        </div>
+        <button class="btn btn-green btn-full" style="margin-top:22px;" onclick="hNext(4)">Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="hBack(4)">← Back</button>
+      </div>
+      <div id="hs5" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 5 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Set your availability</h2>
+        <p style="color:var(--slate);font-size:14px;margin-bottom:8px;">Choose the days and hours you want to open your laundry room to guests. Guests book 2-hour slots within your available window.</p>
+        <div style="background:var(--lime-bright);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--green);margin-bottom:18px;font-weight:500;">ℹ️ Your existing tenants always have priority. Only offer hours you know the room is reliably free.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="availGrid"></div>
+        <button class="btn btn-green btn-full" style="margin-top:22px;" onclick="hNext(5)">Continue →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="hBack(5)">← Back</button>
+      </div>
+      <div id="hs6" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--slate);letter-spacing:.08em;margin-bottom:16px;">STEP 6 OF 7</div>
+        <h2 class="serif" style="font-size:30px;margin-bottom:8px;">Choose your plan</h2>
+        <p style="color:var(--slate);font-size:15px;margin-bottom:24px;">First 30 days are free. No card needed yet.</p>
+        <div style="display:flex;justify-content:center;margin-bottom:20px;">
+          <div class="plan-toggle">
+            <button class="plan-btn on" id="onboardPlanMonthly" onclick="switchOnboardPlan('monthly')">Monthly</button>
+            <button class="plan-btn" id="onboardPlanYearly" onclick="switchOnboardPlan('yearly')">Yearly <span style="background:var(--lime-bright);color:var(--green);padding:2px 8px;border-radius:100px;font-size:11px;margin-left:4px;">Save 30%</span></button>
+          </div>
+        </div>
+        <div style="background:var(--green);border-radius:20px;padding:28px;color:white;text-align:center;margin-bottom:18px;">
+          <div id="onboardMonthlyPrice"><div class="serif" style="font-size:52px;line-height:1;margin-bottom:4px;">$3<span style="font-size:20px;opacity:.6;">/mo</span></div><div style="font-size:13px;color:rgba(255,255,255,.45);">After trial · increases to $5/mo at launch</div></div>
+          <div id="onboardYearlyPrice" style="display:none;"><div class="serif" style="font-size:52px;line-height:1;margin-bottom:4px;">$25<span style="font-size:20px;opacity:.6;">/yr</span></div><div style="font-size:13px;color:var(--lime);font-weight:700;margin-bottom:2px;">Just $2.08/month</div><div style="font-size:13px;color:rgba(255,255,255,.45);">After trial · save $11 vs monthly</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:22px;font-size:14px;color:var(--slate);">
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> 30-day free trial starts now</div>
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> No card required until trial ends</div>
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> If you don't add a card, listing pauses — not deleted</div>
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> 0% commission on machine earnings</div>
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> No ads, ever</div>
+          <div style="display:flex;gap:8px;"><span style="color:var(--green);">✓</span> Cancel any time</div>
+        </div>
+        <button class="btn btn-green btn-full" onclick="hNext(6)">Activate free trial →</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="hBack(6)">← Back</button>
+      </div>
+      <div id="hs7" style="display:none;text-align:center;">
+        <div style="font-size:64px;margin-bottom:16px;">🏢</div>
+        <h2 class="serif" style="font-size:34px;margin-bottom:10px;">You're live!</h2>
+        <p style="color:var(--slate);font-size:15px;line-height:1.75;margin-bottom:24px;">Laundromates near you can now find and book your open slots.</p>
+        <div style="background:var(--lime-bright);border-radius:14px;padding:18px;text-align:left;margin-bottom:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--green);">What happens now:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--slate);">
+            <div>📬 SMS + email for every new booking</div>
+            <div>📸 Notified when a guest checks in</div>
+            <div>💰 Guests pay your machine directly</div>
+            <div>⭐ Build your reputation through verified reviews</div>
+          </div>
+        </div>
+        <div style="background:var(--ink);color:white;border-radius:13px;padding:14px 16px;text-align:left;margin-bottom:22px;display:flex;gap:12px;align-items:center;">
+          <span style="font-size:20px;">🎁</span>
+          <div><strong>30-day free trial active.</strong><div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:2px;">No card until trial ends. We'll remind you before it does.</div></div>
+        </div>
+        <button class="btn btn-green btn-full" onclick="finishHostOnboard()">Go to my dashboard →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     HOST DASHBOARD
+══════════════════════════════ -->
+<div class="screen" id="screen-host-dashboard">
+  <div style="min-height:calc(100vh - 64px);padding:32px 28px;">
+    <div style="max-width:900px;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:12px;">
+        <div><h1 class="serif" style="font-size:34px;">Host Dashboard</h1><p style="color:var(--slate);font-size:14px;margin-top:3px;">Margaret Chen · Cambridge Arms, 247 Concord Ave</p></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <span class="badge badge-green">✅ Verified</span>
+          <span class="badge badge-amber">🎁 Trial: 22 days left</span>
+          <button class="btn btn-ghost btn-sm" onclick="toast('Listing paused. Resume any time.')">Pause listing</button>
+        </div>
+      </div>
+      <!-- Referral banner -->
+      <div style="background:var(--lime-bright);border:1.5px solid var(--lime);border-radius:16px;padding:18px 22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <span style="font-size:24px;">🎁</span>
+          <div><div style="font-weight:700;font-size:14px;">Refer a host, get a free month</div><div style="font-size:13px;color:var(--slate);margin-top:2px;">Share your link. When they go live, you both get one month free.</div></div>
+        </div>
+        <button class="btn btn-ghost-g btn-sm" onclick="toast('Referral link copied!')">Copy my link</button>
+      </div>
+      <!-- Earnings -->
+      <div class="earn-card" style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.07em;margin-bottom:18px;">ACTIVITY THIS MONTH</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:24px;">
+          <div><div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:4px;">Bookings</div><div class="serif" style="font-size:38px;">81</div><div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;">34 unique guests</div></div>
+          <div><div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:4px;">Slots filled</div><div class="serif" style="font-size:38px;">96%</div><div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;">↑ from 88%</div></div>
+          <div><div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:4px;">Rating</div><div class="serif" style="font-size:38px;">4.9★</div><div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;">42 reviews</div></div>
+          <div><div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:4px;">All-time</div><div class="serif" style="font-size:38px;">412</div><div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;">Since Oct 2024</div></div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:20px;padding-top:16px;font-size:13px;color:rgba(255,255,255,.35);">Guests pay your machine directly. laundromate tracks bookings only.</div>
+      </div>
+      <!-- Upcoming -->
+      <div class="card" style="padding:24px;margin-bottom:16px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:18px;">Upcoming bookings</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="border:1.5px solid var(--border);border-radius:13px;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--lime-bright);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;">Alex Rivera <span class="badge badge-green" style="font-size:11px;padding:2px 8px;margin-left:4px;">0 strikes</span></div>
+                <div style="font-size:12px;color:var(--slate);">Sat Feb 22 · 10:00 AM – 12:00 PM</div>
+                <span class="badge badge-green" style="margin-top:6px;display:inline-flex;">Confirmed</span>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="go('messaging')">💬 Message</button>
+          </div>
+          <div style="border:1.5px solid var(--border);border-radius:13px;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:40px;height:40px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;">Priya Sharma <span class="badge badge-green" style="font-size:11px;padding:2px 8px;margin-left:4px;">0 strikes</span></div>
+                <div style="font-size:12px;color:var(--slate);">Sun Feb 23 · 2:00 – 4:00 PM</div>
+                <span class="badge badge-green" style="margin-top:6px;display:inline-flex;">Confirmed</span>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('Message thread opened')">💬 Message</button>
+          </div>
+        </div>
+      </div>
+      <!-- Availability -->
+      <div class="card" style="padding:24px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <div><h3 style="font-size:15px;font-weight:700;">Availability</h3><p style="font-size:13px;color:var(--slate);margin-top:2px;">Guests book 2-hour slots within these windows</p></div>
+          <button class="btn btn-ghost-g btn-sm" id="saveAvailBtn" onclick="saveAvailability()">Save changes</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="hostAvailGrid"></div>
+      </div>
+      <!-- Reviews -->
+      <div class="card" style="padding:24px;">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:18px;">Guest reviews</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="review"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;font-size:14px;">Alex R.</span><span class="stars">★★★★★</span></div><p style="font-size:14px;color:var(--slate);line-height:1.65;">"Clean room, machines worked perfectly. Access code worked first try."</p><div style="font-size:12px;color:var(--muted);margin-top:7px;">Feb 15, 2025</div></div>
+          <div class="review"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;font-size:14px;">Marcus T.</span><span class="stars">★★★★★</span></div><p style="font-size:14px;color:var(--slate);line-height:1.65;">"Basement is well-lit and easy to find. Machines are in great condition."</p><div style="font-size:12px;color:var(--muted);margin-top:7px;">Feb 10, 2025</div></div>
+          <div class="review"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;font-size:14px;">Yuna K.</span><span class="stars">★★★★☆</span></div><p style="font-size:14px;color:var(--slate);line-height:1.65;">"Washer great, one dryer a bit slow but the other was fine. Would come back."</p><div style="font-size:12px;color:var(--muted);margin-top:7px;">Jan 28, 2025</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── DATA ──
+const listings = [
+  { id:1, building:'Cambridge Arms', address:'247 Concord Ave', hood:'Cambridge', city:'Boston', dist:'0.4 mi',
+    washers:2, washerType:'Front-load', washerCap:'Large (4.5 cu ft)', dryers:2, dryerType:'Electric', dryerCap:'Large (8.5 cu ft)',
+    washCost:'$4.00', dryCost:'$2.00', payment:'Coin-operated', rating:4.9, reviews:42, avail:'high', verified:true,
+    bio:'Clean, well-lit basement laundry room in a 12-unit Victorian building. Two washer/dryer pairs available simultaneously.',
+    rules:'Access via basement stairwell. Door code sent after booking. Detergent vending on-site.',
+    availability:'Wed–Sun · 8:00 AM – 6:00 PM',
+    reviewList:[{n:'Alex R.',s:5,t:'Clean room, machines worked perfectly.'},{n:'Sam W.',s:5,t:'Walked over in 2 minutes. No wait, no trip across town.'},{n:'Priya S.',s:4,t:'Front-loaders are great for bigger loads.'}]},
+  { id:2, building:'Allston Commons', address:'89 Brighton Ave', hood:'Allston', city:'Boston', dist:'0.9 mi',
+    washers:1, washerType:'Top-load', washerCap:'Standard (3.5 cu ft)', dryers:1, dryerType:'Electric', dryerCap:'Standard (7 cu ft)',
+    washCost:'$3.50', dryCost:'$1.75', payment:'Built-in card reader', rating:4.7, reviews:28, avail:'high', verified:true,
+    bio:'Shared laundry room, ground floor, 3-unit brownstone.',
+    rules:'Card reader only. Please leave the room as you found it.',
+    availability:'Sat–Sun · 10:00 AM – 4:00 PM',
+    reviewList:[{n:'Jordan M.',s:5,t:'Card reader is super convenient.'},{n:'Chris L.',s:4,t:'Compact but works great.'},{n:'Emily R.',s:5,t:'Easy access, modern machines.'}]},
+  { id:3, building:'Wicker Park Flats', address:'1412 N Milwaukee Ave', hood:'Wicker Park', city:'Chicago', dist:'1.2 mi',
+    washers:3, washerType:'Front-load', washerCap:'Extra-large (5.5 cu ft)', dryers:2, dryerType:'Gas', dryerCap:'Extra-large (9 cu ft)',
+    washCost:'$3.25', dryCost:'$1.50', payment:'App-based (ShinePay)', rating:4.8, reviews:61, avail:'mid', verified:true,
+    bio:'Dedicated laundry floor in a 6-unit building. High-capacity machines.',
+    rules:'ShinePay app required — download before arriving.',
+    availability:'Mon, Wed, Fri · 12:00 PM – 8:00 PM',
+    reviewList:[{n:'Tom H.',s:5,t:'High-capacity machines are incredible.'},{n:'Lea B.',s:5,t:'ShinePay setup was easy.'},{n:'Ravi N.',s:4,t:'Great machines. Book ahead on weekends.'}]},
+  { id:4, building:'East Austin Residences', address:'2209 E Cesar Chavez', hood:'East Austin', city:'Austin', dist:'1.8 mi',
+    washers:2, washerType:'Top-load', washerCap:'Large (4.5 cu ft)', dryers:2, dryerType:'Electric', dryerCap:'Large (8.5 cu ft)',
+    washCost:'$3.00', dryCost:'$1.50', payment:'Coin + card reader', rating:4.6, reviews:19, avail:'mid', verified:false,
+    bio:'Modern shared laundry room with new LG machines installed 2024.',
+    rules:'SMS the host when you arrive. 24h cancellation notice required.',
+    availability:'Tue, Thu · 9:00 AM – 5:00 PM',
+    reviewList:[{n:'Kate S.',s:5,t:'Brand new machines, super clean room.'},{n:'Drew P.',s:4,t:'Coin and card both worked fine.'},{n:'Mia C.',s:5,t:'LG machines are excellent.'}]},
+  { id:5, building:'Capitol Hill Terrace', address:'415 E Pine St', hood:'Capitol Hill', city:'Seattle', dist:'2.1 mi',
+    washers:2, washerType:'Front-load', washerCap:'Extra-large (5.5 cu ft)', dryers:1, dryerType:'Electric', dryerCap:'Extra-large (9 cu ft)',
+    washCost:'$4.50', dryCost:'$2.25', payment:'App-based (Laundryview)', rating:5.0, reviews:14, avail:'low', verified:true,
+    bio:'Premium laundry room in a boutique 8-unit building. Very limited slots.',
+    rules:'Laundryview app required. Quiet hours 8pm–8am.',
+    availability:'Sat only · 10:00 AM – 2:00 PM',
+    reviewList:[{n:'Amy F.',s:5,t:'Extra-large machines handled my comforter perfectly.'},{n:'Nate J.',s:5,t:'Spotless. Laundryview app is seamless.'},{n:'Taylor K.',s:5,t:'Hard to get a slot but worth it every time.'}]}
+];
+
+const days7 = (()=>{ const base=new Date('2025-02-22'); const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; return Array.from({length:7},(_,i)=>{ const d=new Date(base); d.setDate(base.getDate()+i); return {label:dn[d.getDay()],date:d.getDate()}; }); })();
+const slotsByDay = {
+  0:['10:00–12:00 PM','12:00–2:00 PM','2:00–4:00 PM','4:00–6:00 PM'],
+  1:['10:00–12:00 PM','2:00–4:00 PM'],
+  2:['8:00–10:00 AM','10:00–12:00 PM','12:00–2:00 PM','2:00–4:00 PM','4:00–6:00 PM'],
+  3:['12:00–2:00 PM','2:00–4:00 PM','4:00–6:00 PM'],
+  4:['8:00–10:00 AM','10:00–12:00 PM'],
+  5:['10:00–12:00 PM','12:00–2:00 PM','2:00–4:00 PM','4:00–6:00 PM'],
+  6:['10:00–12:00 PM','12:00–2:00 PM']
+};
+const takenByDay = {'0':['10:00–12:00 PM'],'2':['8:00–10:00 AM'],'5':['2:00–4:00 PM']};
+
+let selDay=0, selSlot=null, selListingId=null;
+let guestIn=false, hostIn=false;
+let gStep=1, hStep=1;
+
+// ── AVAILABILITY STATE ──
+const wDays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const defOn=[false,false,true,true,true,true,true];
+const slotOpts=['8:00 AM','10:00 AM','12:00 PM','2:00 PM','4:00 PM','6:00 PM'];
+const endOpts=['10:00 AM','12:00 PM','2:00 PM','4:00 PM','6:00 PM','8:00 PM'];
+const defStart=['10:00 AM','10:00 AM','10:00 AM','10:00 AM','10:00 AM','10:00 AM','10:00 AM'];
+const defEnd=['6:00 PM','6:00 PM','6:00 PM','6:00 PM','6:00 PM','6:00 PM','6:00 PM'];
+let availState = wDays.map((d,i)=>({day:d, on:defOn[i], start:defStart[i], end:defEnd[i]}));
+
+function buildAvailRow(dayObj, idx, forDashboard){
+  const row = document.createElement('div');
+  row.className = 'check-row' + (dayObj.on ? ' on' : '');
+  row.id = 'avrow-' + (forDashboard?'dash':'onboard') + '-' + idx;
+
+  const cb = document.createElement('div');
+  cb.className = 'check-box';
+  cb.innerHTML = dayObj.on ? '✓' : '';
+  cb.onclick = (e) => {
+    e.stopPropagation();
+    availState[idx].on = !availState[idx].on;
+    row.classList.toggle('on', availState[idx].on);
+    cb.innerHTML = availState[idx].on ? '✓' : '';
+    const timeArea = row.querySelector('.time-area');
+    if(timeArea) timeArea.style.display = availState[idx].on ? 'flex' : 'none';
+    const naLabel = row.querySelector('.na-label');
+    if(naLabel) naLabel.style.display = availState[idx].on ? 'none' : 'inline';
+  };
+
+  const label = document.createElement('span');
+  label.style.cssText = 'font-weight:700;font-size:14px;min-width:90px;';
+  label.textContent = dayObj.day;
+
+  const naLabel = document.createElement('span');
+  naLabel.className = 'na-label';
+  naLabel.style.cssText = 'font-size:13px;color:var(--slate);margin-left:auto;' + (dayObj.on ? 'display:none;' : '');
+  naLabel.textContent = 'Unavailable';
+
+  const timeArea = document.createElement('div');
+  timeArea.className = 'time-area';
+  timeArea.style.cssText = 'margin-left:auto;display:' + (dayObj.on?'flex':'none') + ';align-items:center;gap:8px;flex-wrap:wrap;';
+  timeArea.innerHTML = `
+    <select class="field" style="padding:7px 10px;font-size:13px;width:auto;" onchange="availState[${idx}].start=this.value" onclick="event.stopPropagation()">
+      ${slotOpts.map(s=>`<option${s===dayObj.start?' selected':''}>${s}</option>`).join('')}
+    </select>
+    <span style="font-size:12px;color:var(--slate);">to</span>
+    <select class="field" style="padding:7px 10px;font-size:13px;width:auto;" onchange="availState[${idx}].end=this.value" onclick="event.stopPropagation()">
+      ${endOpts.map(s=>`<option${s===dayObj.end?' selected':''}>${s}</option>`).join('')}
+    </select>
+  `;
+
+  row.appendChild(cb);
+  row.appendChild(label);
+  row.appendChild(naLabel);
+  row.appendChild(timeArea);
+  return row;
+}
+
+function renderAvailGrid(){
+  const g=document.getElementById('availGrid'); if(!g)return;
+  g.innerHTML='';
+  availState.forEach((d,i)=>g.appendChild(buildAvailRow(d,i,false)));
+}
+
+function renderHostAvailGrid(){
+  const g=document.getElementById('hostAvailGrid'); if(!g)return;
+  g.innerHTML='';
+  availState.forEach((d,i)=>g.appendChild(buildAvailRow(d,i,true)));
+}
+
+function saveAvailability(){
+  const btn = document.getElementById('saveAvailBtn');
+  btn.textContent = '✓ Saved!';
+  btn.style.background = 'var(--lime-bright)';
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  setTimeout(()=>{ btn.textContent = 'Save changes'; btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }, 2000);
+  toast('Availability updated!');
+}
+
+// ── NAVIGATION ──
+function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); const el=document.getElementById('screen-'+id); if(el){el.classList.add('active');window.scrollTo(0,0);} }
+function handleNavCta(){ if(guestIn) go('guest-discover'); else go('guest-discover-teaser'); }
+
+// ── BANNER ──
+function hideBanner(){ document.getElementById('demoBanner').style.display='none'; document.getElementById('mainNav').style.top='0'; document.getElementById('main').style.paddingTop='64px'; }
+function demoGuest(){ guestIn=true; renderListings(); renderTeaserCards(); go('guest-discover'); hideBanner(); toast('Welcome back, Alex 👋'); }
+function demoHost(){ hostIn=true; renderHostAvailGrid(); go('host-dashboard'); hideBanner(); toast('Welcome back, Margaret 👋'); }
+
+// ── TOAST ──
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ── LOCATION ──
+function useLocation(){ toast('Location access granted (demo) — showing results near you'); document.getElementById('gStreet').value='14 Elm Street, Boston MA'; }
+
+// ── PLAN TOGGLES ──
+function showPlan(p){ document.getElementById('planMonthly').classList.toggle('on',p==='monthly'); document.getElementById('planYearly').classList.toggle('on',p==='yearly'); document.getElementById('priceMonthly').style.display=p==='monthly'?'block':'none'; document.getElementById('priceYearly').style.display=p==='yearly'?'block':'none'; }
+function switchOnboardPlan(p){ document.getElementById('onboardPlanMonthly').classList.toggle('on',p==='monthly'); document.getElementById('onboardPlanYearly').classList.toggle('on',p==='yearly'); document.getElementById('onboardMonthlyPrice').style.display=p==='monthly'?'block':'none'; document.getElementById('onboardYearlyPrice').style.display=p==='yearly'?'block':'none'; }
+
+// ── GUEST ONBOARD ──
+const gPcts=['','33%','66%','100%'];
+function gNext(from){
+  if(from===1){ if(!document.getElementById('gStreet').value){toast('Please enter your street address.');return;} }
+  if(from===2){ if(!document.getElementById('gFirst').value||!document.getElementById('gEmail').value){toast('Please fill in your name and email.');return;} }
+  document.getElementById('gs'+from).style.display='none'; gStep=from+1;
+  document.getElementById('gs'+gStep).style.display='block';
+  document.getElementById('gProg').style.width=gPcts[gStep];
+}
+function gBack(from){ document.getElementById('gs'+from).style.display='none'; gStep=from-1; document.getElementById('gs'+gStep).style.display='block'; document.getElementById('gProg').style.width=gPcts[gStep]; }
+function finishGuestOnboard(){ guestIn=true; renderListings(); go('guest-discover'); toast("You're a Laundromate! 🫧"); }
+
+// ── HOST ONBOARD ──
+const hPcts=['','14%','28%','42%','56%','70%','84%','100%'];
+function hNext(from){ document.getElementById('hs'+from).style.display='none'; hStep=from+1; document.getElementById('hs'+hStep).style.display='block'; document.getElementById('hProg').style.width=hPcts[hStep]; if(hStep===5) renderAvailGrid(); }
+function hBack(from){ document.getElementById('hs'+from).style.display='none'; hStep=from-1; document.getElementById('hs'+hStep).style.display='block'; document.getElementById('hProg').style.width=hPcts[hStep]; }
+function finishHostOnboard(){ hostIn=true; renderHostAvailGrid(); go('host-dashboard'); toast("You're live! 🏢"); }
+
+// ── TEASER CARDS (not signed in) ──
+function renderTeaserCards(){
+  const g=document.getElementById('teaserGrid'); if(!g)return; g.innerHTML='';
+  listings.slice(0,3).forEach(l=>{
+    const av=avInfo(l.avail); const c=document.createElement('div');
+    c.className='card'; c.style.cssText='overflow:hidden;';
+    c.innerHTML=`
+      <div style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:10px;">
+          <div>
+            <div style="font-weight:800;font-size:15px;margin-bottom:2px;filter:blur(0);">${l.building.split(' ')[0]} ██████ ${l.verified?'✅':''}</div>
+            <div style="color:var(--slate);font-size:13px;">${l.hood} · ${l.dist}</div>
+          </div>
+          <span class="avail ${av.cls}"><span class="avail-dot ${av.dot}"></span>${av.lbl}</span>
+        </div>
+        <div style="background:var(--lime-bright);border-radius:10px;padding:11px;display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+          <div style="font-size:13px;"><strong>${l.washers}</strong> washers</div>
+          <div style="width:1px;height:12px;background:var(--border);"></div>
+          <div style="font-size:13px;"><strong>${l.dryers}</strong> dryers</div>
+          <div style="width:1px;height:12px;background:var(--border);"></div>
+          <div style="font-size:13px;">${payIcon(l.payment)}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;align-items:center;gap:5px;"><span class="stars">★</span><span style="font-weight:700;font-size:14px;">${l.rating}</span><span style="color:var(--slate);font-size:13px;">(${l.reviews})</span></div>
+          <div style="font-size:13px;color:var(--muted);font-style:italic;">Sign up to see details →</div>
+        </div>
+      </div>
+    `;
+    g.appendChild(c);
+  });
+}
+
+// ── LISTINGS ──
+function avInfo(a){ return a==='high'?{cls:'avail-high',dot:'dot-high',lbl:'Available now'}:a==='mid'?{cls:'avail-mid',dot:'dot-mid',lbl:'Limited slots'}:{cls:'avail-low',dot:'dot-low',lbl:'Almost full'}; }
+function payIcon(p){ return p.includes('Coin')?'🪙':p.includes('Card')||p.includes('card')?'💳':'📱'; }
+
+function renderListings(){
+  const g=document.getElementById('listingsGrid'); if(!g)return; g.innerHTML='';
+  listings.forEach(l=>{
+    const av=avInfo(l.avail); const c=document.createElement('div'); c.className='card card-hover'; c.onclick=()=>showDetail(l.id);
+    c.innerHTML=`
+      <div style="padding:22px 22px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;">
+          <div><div style="font-weight:800;font-size:15px;margin-bottom:1px;">${l.building} ${l.verified?'<span style="color:var(--green);font-size:13px;">✅</span>':''}</div><div style="color:var(--slate);font-size:13px;">${l.hood} · ${l.dist}</div></div>
+          <div style="text-align:right;flex-shrink:0;"><div style="font-size:11px;color:var(--slate);">Machine pricing</div><div style="font-weight:800;font-size:14px;line-height:1.5;">Wash ${l.washCost}</div><div style="font-weight:800;font-size:14px;line-height:1.5;">Dry ${l.dryCost}</div></div>
+        </div>
+        <div style="background:var(--lime-bright);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div style="font-size:13px;"><strong>${l.washers}</strong> × ${l.washerType}</div>
+          <div style="width:1px;height:14px;background:var(--lime);"></div>
+          <div style="font-size:13px;"><strong>${l.dryers}</strong> × ${l.dryerType}</div>
+          <div style="width:1px;height:14px;background:var(--lime);"></div>
+          <div style="font-size:13px;">${payIcon(l.payment)}</div>
+          <div style="margin-left:auto;"><span class="avail ${av.cls}"><span class="avail-dot ${av.dot}"></span>${av.lbl}</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--slate);margin-bottom:12px;">🕐 ${l.availability}</div>
+      </div>
+      <div style="padding:0 22px 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;align-items:center;gap:5px;"><span class="stars">★</span><span style="font-weight:700;font-size:14px;">${l.rating}</span><span style="color:var(--slate);font-size:13px;">(${l.reviews})</span></div>
+        <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();showDetail(${l.id})">Book slot →</button>
+      </div>`;
+    g.appendChild(c);
+  });
+}
+
+// ── DETAIL ──
+function showDetail(id){
+  selListingId=id; selSlot=null; selDay=0;
+  const l=listings.find(x=>x.id===id); const av=avInfo(l.avail);
+  document.getElementById('detailWrap').innerHTML=`
+    <div class="fade-up">
+      <button onclick="go('guest-discover')" style="background:none;border:none;cursor:pointer;color:var(--green);font-weight:700;font-size:14px;padding:0;margin-bottom:24px;display:inline-flex;align-items:center;gap:6px;">← Back to listings</button>
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;" class="r-col">
+        <div>
+          <div style="background:linear-gradient(135deg,var(--lime-bright),var(--lime));border-radius:22px;padding:40px;text-align:center;margin-bottom:20px;">
+            <div style="font-size:64px;margin-bottom:10px;">🏢</div>
+            <div style="font-weight:800;font-size:15px;">${l.building}</div>
+            <div style="color:var(--slate);font-size:14px;margin-top:4px;">${l.address}, ${l.hood}</div>
+          </div>
+          <div class="card" style="padding:24px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+              <div><h1 style="font-size:22px;font-weight:800;margin-bottom:4px;">${l.building} ${l.verified?'<span style="color:var(--green);">✅</span>':''}</h1><div style="color:var(--slate);font-size:13px;">📍 ${l.address} · ${l.dist} from you</div></div>
+              <span class="avail ${av.cls}"><span class="avail-dot ${av.dot}"></span>${av.lbl}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;"><span class="stars">★★★★★</span><span style="font-weight:700;">${l.rating}</span><span style="color:var(--slate);">(${l.reviews} reviews)</span></div>
+            <p style="color:var(--slate);font-size:14px;line-height:1.8;">${l.bio}</p>
+          </div>
+          <div class="card" style="padding:24px;margin-bottom:16px;">
+            <h3 style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--slate);margin-bottom:16px;">MACHINE DETAILS</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" class="r-col-2">
+              <div style="padding:16px;background:var(--lime-bright);border-radius:12px;"><div style="font-size:18px;margin-bottom:8px;">🫧</div><div style="font-weight:700;font-size:14px;margin-bottom:6px;">Washers (${l.washers})</div><div style="font-size:13px;color:var(--slate);display:flex;flex-direction:column;gap:3px;"><div>${l.washerType}</div><div>${l.washerCap}</div><div style="font-weight:700;color:var(--green);margin-top:4px;">${l.washCost} per cycle</div></div></div>
+              <div style="padding:16px;background:white;border:1.5px solid var(--border);border-radius:12px;"><div style="font-size:18px;margin-bottom:8px;">♨️</div><div style="font-weight:700;font-size:14px;margin-bottom:6px;">Dryers (${l.dryers})</div><div style="font-size:13px;color:var(--slate);display:flex;flex-direction:column;gap:3px;"><div>${l.dryerType}</div><div>${l.dryerCap}</div><div style="font-weight:700;color:var(--green);margin-top:4px;">${l.dryCost} per cycle</div></div></div>
+            </div>
+            <div style="margin-top:14px;padding:14px 16px;background:white;border:1.5px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">${payIcon(l.payment)}</span><div><div style="font-weight:700;font-size:14px;">Payment</div><div style="font-size:13px;color:var(--slate);margin-top:2px;">${l.payment}</div></div></div>
+          </div>
+          <div class="card" style="padding:24px;margin-bottom:16px;"><h3 style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--slate);margin-bottom:12px;">ACCESS & RULES</h3><p style="color:var(--slate);font-size:14px;line-height:1.8;">${l.rules}</p></div>
+          <div class="card" style="padding:24px;">
+            <h3 style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--slate);margin-bottom:16px;">REVIEWS</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;">${l.reviewList.map(r=>`<div class="review"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-weight:700;font-size:14px;">${r.n}</span><span class="stars">${'★'.repeat(r.s)}${'☆'.repeat(5-r.s)}</span></div><p style="font-size:14px;color:var(--slate);line-height:1.65;">"${r.t}"</p></div>`).join('')}</div>
+          </div>
+        </div>
+        <div style="position:sticky;top:80px;">
+          <div class="card" style="padding:24px;">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:4px;">Book a slot</h3>
+            <p style="font-size:13px;color:var(--slate);margin-bottom:6px;">Each slot is 2 hours. Pick your day, then your time.</p>
+            <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:16px;">🕐 Host availability: ${l.availability}</div>
+            <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;" id="dayTabs">${days7.map((d,i)=>`<button class="day-btn${i===0?' on':''}" onclick="pickDay(${i})" id="dt${i}"><div style="font-size:10px;opacity:.6;">${d.label}</div><div style="font-size:16px;font-weight:800;">${d.date}</div></button>`).join('')}</div>
+            <div style="display:flex;flex-direction:column;gap:7px;" id="slotsWrap"></div>
+            <button class="btn btn-dark btn-full" style="margin-top:16px;" onclick="confirmBook(${l.id})">Confirm slot →</button>
+            <div style="margin-top:12px;background:#f7f7f7;border-radius:10px;padding:11px 13px;font-size:12px;color:var(--slate);">💳 First booking? We hold a $5 refundable deposit — returned after check-in.</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  go('listing-detail');
+  setTimeout(()=>renderSlots(0),30);
+}
+
+function renderSlots(dayIdx){
+  const w=document.getElementById('slotsWrap'); if(!w)return;
+  const available=slotsByDay[dayIdx]||[];
+  const taken=takenByDay[dayIdx]||[];
+  if(available.length===0){ w.innerHTML='<div style="text-align:center;padding:20px;font-size:14px;color:var(--muted);">No slots available this day.</div>'; return; }
+  w.innerHTML=available.map(s=>{
+    const t=taken.includes(s); const p=selSlot===s&&selDay===dayIdx;
+    return `<div class="slot${t?' taken':''}${p?' picked':''}" data-slot="${s}">${s}${t?'<span style="display:block;font-size:11px;opacity:.4;margin-top:1px;">Taken</span>':''}</div>`;
+  }).join('');
+  w.querySelectorAll('.slot:not(.taken)').forEach(el=>{ el.onclick=()=>{ selSlot=el.dataset.slot; selDay=dayIdx; renderSlots(dayIdx); toast('Slot selected: '+selSlot); }; });
+}
+
+function pickDay(i){ selDay=i; selSlot=null; document.querySelectorAll('.day-btn').forEach((el,j)=>el.classList.toggle('on',j===i)); renderSlots(i); }
+
+// ── BOOKING CONFIRM ──
+function confirmBook(lid){
+  if(!selSlot){toast('Please pick a time slot first.');return;}
+  const l=listings.find(x=>x.id===lid); const day=days7[selDay];
+  document.getElementById('bookingConfirmBox').innerHTML=`
+    <div class="fade-up">
+      <h2 class="serif" style="font-size:30px;margin-bottom:6px;">Confirm your slot</h2>
+      <p style="color:var(--slate);font-size:15px;margin-bottom:24px;">Review everything before locking it in.</p>
+      <div style="background:var(--lime-bright);border-radius:16px;padding:20px;margin-bottom:16px;">
+        <div style="font-weight:800;font-size:15px;margin-bottom:14px;">${l.building} · ${l.hood}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Date</span><span style="font-weight:700;">${day.label}, Feb ${day.date}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Slot</span><span style="font-weight:700;">${selSlot} (2 hours)</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Washers</span><span style="font-weight:700;">${l.washers} × ${l.washerType} · ${l.washCost}/cycle</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Dryers</span><span style="font-weight:700;">${l.dryers} × ${l.dryerType} · ${l.dryCost}/cycle</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Payment</span><span style="font-weight:700;">${l.payment}</span></div>
+        </div>
+      </div>
+      <div style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:10px;">What laundromate charges you today</div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--slate);">Slot reservation</span><span style="font-weight:700;color:var(--green);">Free</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;"><span style="color:var(--slate);">First-time deposit (refundable)</span><span style="font-weight:700;">$5.00</span></div>
+        <hr class="rule" style="margin:12px 0;">
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;"><span>Due now</span><span>$5.00</span></div>
+        <div style="font-size:12px;color:var(--slate);margin-top:6px;line-height:1.6;">Returned automatically after check-in. You have 15 minutes from your slot start to check in or it's marked as a no-show.</div>
+      </div>
+      <button class="btn btn-dark btn-full" onclick="finalizeBook(${l.id})">Lock in my slot →</button>
+      <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="showDetail(${l.id})">← Go back</button>
+    </div>`;
+  go('booking-confirm');
+}
+
+function finalizeBook(lid){
+  const l=listings.find(x=>x.id===lid); const day=days7[selDay];
+  document.getElementById('postDetails').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Building</span><span style="font-weight:700;">${l.building}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Address</span><span style="font-weight:700;">${l.address}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Date & time</span><span style="font-weight:700;">${day.label} Feb ${day.date} · ${selSlot}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Access code</span><span style="font-weight:700;font-family:monospace;background:var(--lime-bright);padding:3px 12px;border-radius:6px;letter-spacing:.1em;">4829#</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Wash</span><span style="font-weight:700;">${l.washCost}/cycle</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Dry</span><span style="font-weight:700;">${l.dryCost}/cycle</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--slate);">Payment</span><span style="font-weight:700;">${l.payment}</span></div>
+    </div>`;
+  go('post-booking');
+  toast('Slot locked in! 🫧');
+}
+
+// ── CHECK IN ──
+let checkinInterval;
+function simulatePhoto(boxId, nextId){
+  const box = document.getElementById(boxId);
+  box.innerHTML = '<div style="font-size:40px;margin-bottom:10px;">⏳</div><div style="font-weight:700;font-size:15px;">Processing photo…</div>';
+  setTimeout(()=>{
+    box.classList.add('done');
+    box.innerHTML = '<div style="font-size:40px;margin-bottom:10px;">✅</div><div style="font-weight:700;font-size:15px;color:var(--green);">Photo confirmed</div><div style="font-size:13px;color:var(--slate);margin-top:4px;">Timestamped · geotagged</div>';
+    setTimeout(()=>{ document.getElementById('checkin-step1').style.display='none'; document.getElementById(nextId).style.display='block'; }, 800);
+  }, 1500);
+}
+
+// Countdown timer (demo)
+function startCheckinTimer(){
+  let secs = 14*60+32;
+  checkinInterval = setInterval(()=>{
+    secs--;
+    if(secs<=0){clearInterval(checkinInterval);return;}
+    const m=Math.floor(secs/60), s=secs%60;
+    const el=document.getElementById('checkinTimer');
+    if(el) el.textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+
+// ── MESSAGING ──
+function sendMsg(){
+  const input = document.getElementById('msgInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  const thread = document.getElementById('msgThread');
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:4px;';
+  bubble.innerHTML = `<div class="msg-bubble-out">${msg}</div><div class="msg-time">You · Just now</div>`;
+  thread.appendChild(bubble);
+  thread.scrollTop = thread.scrollHeight;
+  input.value = '';
+  // Auto-reply after delay
+  setTimeout(()=>{
+    const reply = document.createElement('div');
+    reply.style.cssText='display:flex;flex-direction:column;align-items:flex-start;gap:4px;';
+    reply.innerHTML='<div class="msg-bubble-in">Got it! See you then 👋</div><div class="msg-time">Margaret · Just now</div>';
+    thread.appendChild(reply);
+    thread.scrollTop = thread.scrollHeight;
+  }, 1500);
+}
+
+// ── CANCEL BOOKING ──
+function cancelBooking(){
+  const confirmed = confirm('Cancel this booking? Cancellations more than 24 hours before your slot have no penalty.');
+  if(confirmed) toast('Booking cancelled. No strike issued.');
+}
+
+// ── INIT ──
+renderListings();
+renderTeaserCards();
+renderAvailGrid();
+renderHostAvailGrid();
+// Start checkin timer when that screen is visited
+const orig = go;
+window.go = function(id){
+  orig(id);
+  if(id==='guest-checkin'){ clearInterval(checkinInterval); startCheckinTimer(); }
+};
+</script>
+</body>
+</html>
