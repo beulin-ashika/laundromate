@@ -49,36 +49,54 @@ body {
 /* ─── HERO ────────────────────────── */
 .hero {
   background: var(--green);
-  padding: 80px 40px 72px;
+  padding: 88px 48px 80px;
   position: relative; overflow: hidden;
+  text-align: center;
 }
 .hero::after {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 0%, rgba(184,228,199,.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(184,228,199,.1) 0%, transparent 60%);
   pointer-events: none;
 }
-.hero-inner { max-width: 760px; position: relative; z-index: 1; }
+.hero-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  position: relative; z-index: 1;
+}
 .hero-eyebrow {
   font-size: 11px; font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--lime); opacity: .8;
+  text-transform: uppercase; color: var(--lime); opacity: .7;
   margin-bottom: 24px; display: block;
 }
 .hero-title {
   font-family: 'Fraunces', serif;
-  font-size: clamp(40px, 6vw, 68px);
-  line-height: 1.04; font-weight: 400;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 1.06; font-weight: 400;
   color: #fff; margin-bottom: 20px;
 }
 .hero-title em { font-style: italic; }
 .hero-sub {
-  font-size: 17px; line-height: 1.7;
-  color: rgba(255,255,255,.55);
-  max-width: 520px; margin-bottom: 48px;
+  font-size: 17px; line-height: 1.72;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 40px;
+  max-width: 560px;
+  margin-left: auto; margin-right: auto;
 }
+.hero-cta {
+  display: inline-block;
+  background: var(--lime); color: var(--green);
+  padding: 15px 32px; border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  transition: background .15s;
+  margin-bottom: 48px;
+}
+.hero-cta:hover { background: #c0eacc; }
 .hero-byline {
-  display: flex; align-items: center; gap: 12px;
+  display: inline-flex; align-items: center; gap: 12px;
   padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1);
+  width: 100%; justify-content: center;
 }
 .hero-avatar {
   width: 36px; height: 36px; border-radius: 50%;
@@ -90,41 +108,11 @@ body {
 .hero-byline-name { font-size: 14px; font-weight: 600; color: #fff; }
 .hero-byline-date { font-size: 12px; color: rgba(255,255,255,.35); margin-top: 2px; }
 
-/* ─── HERO CTA ───────────────────── */
-.hero-inner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 40px;
-  align-items: end;
-  max-width: 1040px;
-  position: relative; z-index: 1;
-}
-.hero-left { max-width: 680px; }
-.hero-right {
-  display: flex; flex-direction: column;
-  align-items: flex-end; justify-content: flex-end;
-  padding-bottom: 4px;
-  flex-shrink: 0;
-}
-.hero-cta {
-  background: var(--lime); color: var(--green);
-  padding: 14px 26px; border-radius: 10px;
-  font-size: 14px; font-weight: 700;
-  text-decoration: none; white-space: nowrap;
-  transition: background .15s;
-  display: inline-block;
-}
-.hero-cta:hover { background: #c0eacc; }
-@media (max-width: 700px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-right { align-items: flex-start; }
-}
-
 /* ─── HIGHLIGHT ──────────────────── */
 .hl { background: #d8f3dc; color: var(--green); padding: 1px 4px; border-radius: 3px; }
 
 /* ─── PAGE BODY ───────────────────── */
-.page { max-width: 720px; margin: 0 auto; padding: 0 40px; }
+.page { max-width: 1100px; margin: 0 auto; padding: 0 48px; }
 .marker {
   display: flex; align-items: center; gap: 0;
   margin: 72px 0 32px;
@@ -214,14 +202,15 @@ sup { font-size: 9px; color: var(--faint); vertical-align: super; line-height: 0
 /* ─── CONCEPT BAND ────────────────── */
 .concept-band {
   background: var(--ink);
-  margin: 72px -40px 0;
-  padding: 56px 40px;
+  margin: 72px 0 0;
+  padding: 64px 48px;
+  width: 100%;
 }
 .concept-band .marker-label {
   background: rgba(216,243,220,.15);
   color: var(--lime);
 }
-.concept-band h2 { color: #fff; margin-bottom: 20px; }
+.concept-band h2 { color: #fff; margin-bottom: 24px; }
 .concept-band p  { color: rgba(255,255,255,.6); }
 
 /* ─── HYPOTHESIS ──────────────────── */
@@ -238,33 +227,33 @@ sup { font-size: 9px; color: var(--faint); vertical-align: super; line-height: 0
   margin-bottom: 12px; display: block;
 }
 .hypothesis p {
-  font-family: 'Fraunces', serif;
-  font-size: 18px; font-weight: 300; line-height: 1.65;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 400; line-height: 1.72;
   color: rgba(255,255,255,.82); margin: 0;
 }
 
-/* ─── ITERATION BLOCKS ────────────── */
 .iter {
   border: 1px solid var(--rule);
   border-radius: 10px; overflow: hidden;
   margin: 14px 0 36px;
 }
-.iter-row { display: grid; grid-template-columns: 104px 1fr; }
+.iter-row { display: grid; grid-template-columns: 140px 1fr; }
 .iter-row + .iter-row { border-top: 1px solid var(--rule); }
 .iter-tag {
-  padding: 16px 14px;
+  padding: 16px 18px;
   font-size: 10px; font-weight: 700;
-  letter-spacing: .08em; text-transform: uppercase;
+  letter-spacing: .07em; text-transform: uppercase;
   border-right: 1px solid var(--rule);
   display: flex; align-items: flex-start;
-  padding-top: 18px; line-height: 1.5;
+  padding-top: 18px; line-height: 1.4;
+  white-space: nowrap;
 }
 .iter-tag.t-first  { background: var(--amber-bg); color: var(--amber); border-right-color: #e8d8a0; }
 .iter-tag.t-change { background: var(--blue-bg);  color: var(--blue);  border-right-color: #c7d9f8; }
 .iter-tag.t-final  { background: var(--lime);     color: var(--green); border-right-color: #a8d8b8; }
 .iter-tag.t-next   { background: #f2f2f2;          color: #555;         border-right-color: #ddd; }
 .iter-body {
-  padding: 16px 20px;
+  padding: 16px 22px;
   font-size: 14px; line-height: 1.72; color: var(--body);
 }
 .iter-tag.t-first  ~ .iter-body { background: #fffef6; }
@@ -276,11 +265,13 @@ sup { font-size: 9px; color: var(--faint); vertical-align: super; line-height: 0
 /* ─── DARK SECTION (present version) */
 .dark-band {
   background: var(--green);
-  margin: 72px -40px 0;
-  padding: 56px 40px;
+  margin: 72px 0 0;
+  padding: 64px 48px;
+  width: 100%;
 }
 .dark-band .marker-label { background: rgba(216,243,220,.15); color: var(--lime); }
 .dark-band h2 { color: #fff; }
+.dark-band-inner { max-width: 1300px; margin: 0 auto; }
 
 /* ─── VALUE FLOW ──────────────────── */
 .vflow {
@@ -309,9 +300,10 @@ sup { font-size: 9px; color: var(--faint); vertical-align: super; line-height: 0
 .flow-band {
   background: var(--bg);
   border-top: 4px solid var(--green);
-  padding: 40px;
-  margin: 0 -40px;
+  padding: 48px;
+  width: 100%;
 }
+.flow-band-inner { max-width: 1300px; margin: 0 auto; }
 .flow-label {
   font-size: 11px; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: var(--mid);
@@ -371,14 +363,14 @@ tr:nth-child(even) td { background: var(--bg); }
 .td-cost    { color: var(--mid); }
 
 /* ─── OPEN ITEMS ──────────────────── */
-.open-list { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+.open-list { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .open-item {
   border: 1px solid var(--rule);
   border-radius: 10px; overflow: hidden;
   background: var(--white);
 }
-.open-content { padding: 20px 24px; }
-.open-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.open-content { padding: 22px 24px; }
+.open-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .open-tag {
   font-size: 9px; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; padding: 4px 10px;
@@ -442,29 +434,28 @@ tr:nth-child(even) td { background: var(--bg); }
 .sources a  { color: var(--faint); text-underline-offset: 2px; }
 
 /* ─── RESPONSIVE ──────────────────── */
-@media (max-width: 860px) {
+@media (max-width: 1000px) {
   .iter-grid { grid-template-columns: 1fr !important; }
+  .open-list { grid-template-columns: 1fr !important; }
+  .problem-cols { grid-template-columns: 1fr !important; }
+  .concept-cols { grid-template-columns: 1fr !important; }
+  .hero-inner { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 700px) {
   .hero, .concept-band, .dark-band, .flow-band { padding-left: 24px; padding-right: 24px; }
   .page { padding: 0 24px; }
-  .concept-band, .dark-band { margin-left: -24px; margin-right: -24px; }
-  .flow-band { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
   .vflow { grid-template-columns: 1fr; }
   .flow-grid { grid-template-columns: repeat(3, 1fr); }
   .flow-step:nth-child(3) { border-right: none; }
   .flow-step:nth-child(n+4) { border-top: 1px solid var(--rule); }
-  .stats { grid-template-columns: 1fr; gap: 1px; }
-  .open-item { grid-template-columns: 70px 1fr; }
   .iter-row { grid-template-columns: 80px 1fr; }
+  .iter-tag { white-space: normal; }
   .nav { padding: 0 24px; }
 }
 @media (max-width: 480px) {
   .flow-grid { grid-template-columns: repeat(2, 1fr); }
   .flow-step:nth-child(2) { border-right: none; }
   .flow-step:nth-child(n+3) { border-top: 1px solid var(--rule); }
-  .open-item { grid-template-columns: 1fr; }
-  .open-tag-col { border-right: none; border-bottom: 1px solid var(--rule); }
 }
 </style>
 </head>
@@ -479,20 +470,16 @@ tr:nth-child(even) td { background: var(--bg); }
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-left">
-      <span class="hero-eyebrow">Product Management · Marketplace Design · Trust and Safety</span>
-      <h1 class="hero-title"><em>I wanted to make laundry<br>less of a chore.</em></h1>
-      <p class="hero-sub">I developed Laundromate to make laundry accessible to the 35 million renters who need it most.</p>
-      <div class="hero-byline">
-        <div class="hero-avatar">B</div>
-        <div>
-          <div class="hero-byline-name">Beulin Ashika Nithyanandam</div>
-          <div class="hero-byline-date">February 2025</div>
-        </div>
+    <span class="hero-eyebrow">Product Management · Marketplace Design · Trust and Safety</span>
+    <h1 class="hero-title"><em>I wanted to make laundry less of a chore.</em></h1>
+    <p class="hero-sub">I developed Laundromate to make laundry accessible to the 35 million renters who need it most.</p>
+    <a href="laundromate_v6.html" target="_blank" class="hero-cta">Check out Laundromate →</a>
+    <div class="hero-byline">
+      <div class="hero-avatar">B</div>
+      <div style="text-align:left;">
+        <div class="hero-byline-name">Beulin Ashika Nithyanandam</div>
+        <div class="hero-byline-date">February 2025</div>
       </div>
-    </div>
-    <div class="hero-right">
-      <a href="laundromate_v6.html" target="_blank" class="hero-cta">Check out Laundromate →</a>
     </div>
   </div>
 </div>
@@ -504,32 +491,15 @@ tr:nth-child(even) td { background: var(--bg); }
   <div class="marker"><span class="marker-label">The Problem</span></div>
   <h2>35 million US renter households have no in-unit laundry.</h2>
 
-  <p>Most rely on commercial laundromats, paying an average of <strong>$4.50 per load</strong><sup>2</sup> and travelling roughly <strong>half a mile each way</strong>.<sup>3</sup> The time and cost stack up. Many renters end up waiting longer between washes than they would if a machine were closer.</p>
-
-  <div class="personal">
-    <span class="personal-label">Why I built this</span>
-    <p>As an international student, I lived in several apartments without in-unit laundry. The nearest laundromat was a <strong>15 to 20 minute walk each way</strong>, and the cost and effort of it meant I put off washing longer than I should have. When I eventually moved somewhere with a laundry room in the basement, I thought about all the buildings I had walked past that probably had the same thing sitting idle below street level. That is where this started.</p>
-  </div>
-
-  <p>Most mid-size apartment buildings have shared laundry rooms installed for tenants. Those rooms <span class="hl">run at a fraction of their capacity</span>. Landlords earn nothing from the idle hours. Nearby renters have no idea the machines exist.</p>
-
-  <div class="key-statement">Supply was never the problem.<br><span style="text-decoration:underline;text-underline-offset:4px;">Access was.</span></div>
-
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-n">35M</span>
-      <span class="stat-l">US renter households without in-unit laundry</span>
-      <span class="stat-s"><a href="https://www.jchs.harvard.edu/sites/default/files/reports/files/Harvard_JCHS_Americas_Rental_Housing_2022.pdf" target="_blank">Harvard JCHS, 2022</a><sup>1</sup></span>
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:56px;align-items:start;" class="problem-cols">
+    <div>
+      <p>Most rely on commercial laundromats, paying an average of <strong>$4.50 per load</strong><sup>2</sup> and travelling roughly <strong>half a mile each way</strong>.<sup>3</sup> The time and cost stack up. Many renters end up waiting longer between washes than they would if a machine were closer.</p>
+      <p>Most mid-size apartment buildings have shared laundry rooms installed for tenants. Those rooms <strong>run at a fraction of their capacity</strong>. Landlords earn nothing from the idle hours. Nearby renters have no idea the machines exist.</p>
+      <div class="key-statement">Supply was never the problem. <span style="text-decoration:underline;text-underline-offset:4px;">Access was.</span></div>
     </div>
-    <div class="stat">
-      <span class="stat-n">$4.50</span>
-      <span class="stat-l">Avg cost per load at a commercial laundromat</span>
-      <span class="stat-s"><a href="https://www.coinlaundry.org" target="_blank">Coin Laundry Association, 2023</a><sup>2</sup></span>
-    </div>
-    <div class="stat">
-      <span class="stat-n">0.5 mi</span>
-      <span class="stat-l">Median distance renters travel to reach a laundry facility</span>
-      <span class="stat-s"><a href="https://www.census.gov/programs-surveys/ahs.html" target="_blank">US Census AHS, 2021</a><sup>3</sup></span>
+    <div class="personal" style="margin:0;">
+      <span class="personal-label">Why I built this</span>
+      <p>As an international student, I lived in several apartments without in-unit laundry. The nearest laundromat was a <strong>15 to 20 minute walk each way</strong>, and the cost and effort of it meant I put off washing longer than I should have. When I eventually moved somewhere with a laundry room in the basement, I thought about all the buildings I had walked past that probably had the same thing sitting idle below street level. That is where this started.</p>
     </div>
   </div>
 
@@ -537,13 +507,17 @@ tr:nth-child(even) td { background: var(--bg); }
 
 <!-- THE CONCEPT -->
 <div class="concept-band">
-  <div class="page" style="padding-top:0;padding-bottom:0;">
+  <div style="max-width:1300px;margin:0 auto;">
     <div class="marker" style="margin-top:0;"><span class="marker-label">The Concept</span></div>
-    <h2>What if the machine next door was bookable?</h2>
-    <p>Building laundry rooms have predictable idle time. Renters nearby need access. A platform that connects the two, handles scheduling, and builds trust on both sides could close that gap <strong style="color:#fff;">without requiring any new infrastructure.</strong></p>
-    <div class="hypothesis">
-      <span class="hypothesis-label">Product hypothesis</span>
-      <p>Renters do not choose laundromats because they prefer them. They choose them because no alternative is visible. If a verified, bookable machine exists within walking distance, the laundromat stops being the default.</p>
+    <div style="display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:start;" class="concept-cols">
+      <div>
+        <h2 style="color:#fff;margin-bottom:24px;">What if the machine next door was bookable?</h2>
+        <p style="font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.78;color:rgba(255,255,255,.6);margin:0;">Building laundry rooms have predictable idle time. Renters nearby need access. A platform that connects the two, handles scheduling, and builds trust on both sides could close that gap <strong style="color:#fff;">without requiring any new infrastructure.</strong></p>
+      </div>
+      <div class="hypothesis" style="margin:0;">
+        <span class="hypothesis-label">Product hypothesis</span>
+        <p>Renters do not choose laundromats because they prefer them. They choose them because no alternative is visible. If a verified, bookable machine exists within walking distance, the laundromat stops being the default.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -660,7 +634,7 @@ tr:nth-child(even) td { background: var(--bg); }
 
 <!-- PRESENT VERSION -->
 <div class="dark-band">
-  <div class="page" style="padding-top:0;padding-bottom:0;">
+  <div class="dark-band-inner">
     <div class="marker" style="margin-top:0;"><span class="marker-label">The Present Version</span></div>
     <h2>How laundromate works today</h2>
     <div class="vflow">
@@ -688,7 +662,7 @@ tr:nth-child(even) td { background: var(--bg); }
 
 <!-- BOOKING FLOW -->
 <div class="flow-band">
-  <div class="page" style="padding-top:0;padding-bottom:0;">
+  <div class="flow-band-inner">
     <div class="flow-label">Booking flow</div>
     <div class="flow-grid">
       <div class="flow-step"><div class="flow-n">01</div><div class="flow-title">Search</div><div class="flow-desc">Street address or location, sorted by proximity.</div></div>
